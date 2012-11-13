@@ -115,21 +115,13 @@ namespace tbc {
 
 	bool CheckCollision(int minX, int minY, int maxX, int maxY, string sOccupier) {
 		int posXTiles;
-		if((maxX-minX)%tileSize==0) {
-			posXTiles = (maxX-minX)/tileSize;
-		}
-		else {
-			posXTiles = ((maxX-minX)+tileSize)/tileSize;
-		}
+		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
+		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
 
-			
+		
 		int posYTiles;
-		if((maxY-minY)%tileSize==0) {
-			posYTiles = (maxY-minY)/tileSize;
-		}
-		else {
-			posYTiles = ((maxY-minY)+tileSize)/tileSize;
-		}
+		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
+		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 		
 		bool collision = false;
 
@@ -146,21 +138,13 @@ namespace tbc {
 
 	bool CheckCollision(int minX, int minY, int maxX, int maxY) {
 		int posXTiles;
-		if((maxX-minX)%tileSize==0) {
-			posXTiles = (maxX-minX)/tileSize;
-		}
-		else {
-			posXTiles = ((maxX-minX)+tileSize)/tileSize;
-		}
+		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
+		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
 
 			
 		int posYTiles;
-		if((maxY-minY)%tileSize==0) {
-			posYTiles = (maxY-minY)/tileSize;
-		}
-		else {
-			posYTiles = ((maxY-minY)+tileSize)/tileSize;
-		}
+		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
+		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 		
 		bool collision = false;
 
@@ -180,20 +164,12 @@ namespace tbc {
 		vector<cdTile *> collisionArray;
 		
 		int posXTiles;
-		if((maxX-minX)%tileSize==0) {
-			posXTiles = (maxX-minX)/tileSize;
-		}
-		else {
-			posXTiles = ((maxX-minX)+tileSize)/tileSize;
-		}
+		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
+		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
 			
 		int posYTiles;
-		if((maxY-minY)%tileSize==0) {
-			posYTiles = (maxY-minY)/tileSize;
-		}
-		else {
-			posYTiles = ((maxY-minY)+tileSize)/tileSize;
-		}
+		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
+		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
 		if(!OnlyReturnTaken) {
 			for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
@@ -223,21 +199,13 @@ namespace tbc {
 
 	void UnSetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier) {
 		int posXTiles;
-		if((maxX-minX)%tileSize==0) {
-			posXTiles = (maxX-minX)/tileSize;
-		}
-		else {
-			posXTiles = ((maxX-minX)+tileSize)/tileSize;
-		}
+		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
+		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
 
 			
 		int posYTiles;
-		if((maxY-minY)%tileSize==0) {
-			posYTiles = (maxY-minY)/tileSize;
-		}
-		else {
-			posYTiles = ((maxY-minY)+tileSize)/tileSize;
-		}
+		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
+		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
 		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
@@ -254,19 +222,13 @@ namespace tbc {
 
 	void SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier) {
 		int posXTiles;
-		if((maxX-minX)%tileSize==0) {
-			posXTiles = (maxX-minX)/tileSize;
-		} else {
-			posXTiles = ((maxX-minX)+tileSize)/tileSize;
-		}
+		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
+		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
 
-			
+		
 		int posYTiles;
-		if((maxY-minY)%tileSize==0) {
-			posYTiles = (maxY-minY)/tileSize;
-		} else {
-			posYTiles = ((maxY-minY)+tileSize)/tileSize;
-		}
+		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
+		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
 		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
@@ -277,19 +239,13 @@ namespace tbc {
 
 	vector<cdTile *> SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier, int id) {
 		int posXTiles;
-		if((maxX-minX)%tileSize==0) {
-			posXTiles = (maxX-minX)/tileSize;
-		} else {
-			posXTiles = ((maxX-minX)+tileSize)/tileSize;
-		}
+		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
+		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
 
-			
+		
 		int posYTiles;
-		if((maxY-minY)%tileSize==0) {
-			posYTiles = (maxY-minY)/tileSize;
-		} else {
-			posYTiles = ((maxY-minY)+tileSize)/tileSize;
-		}
+		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
+		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
 		vector<cdTile *> yourTiles;	
 
