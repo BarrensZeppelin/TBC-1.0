@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <time.h>
 using namespace std;
 
 namespace tbc {
@@ -19,14 +20,19 @@ namespace tbc {
 		int tX;
 		int tY;
 
-		vector<string> occupiers;
+		vector<string *> occupiers;
 		vector<int> occupierIDs;
 
 	public:
-		cdTile();
-		~cdTile(){}
+		cdTile(int x, int y) : tX(x), tY(y) {}
+		cdTile() {tX=0;tY=0;}
+		~cdTile() {
+			for(unsigned int i=0; i<occupiers.size(); i++) {
+				delete occupiers[i];
+			}
+		}
 		
-		void setTaken(string sTakenBy, int id) {
+		void setTaken(string * sTakenBy, int id) {
 			occupiers.push_back(sTakenBy);
 			occupierIDs.push_back(id);
 		}
@@ -35,18 +41,20 @@ namespace tbc {
 			if(id == -1) {
 				int index = -1;
 				for(unsigned int i = 0; i < occupiers.size() && index==-1; i++) {
-					if(occupiers[i].compare(sTakenBy)==0) {
+					if(occupiers[i]->compare(sTakenBy)==0) {
 						index = i;
+						delete occupiers[index];
 						occupiers.erase(occupiers.begin()+index);
 					}
 				}
 				occupierIDs.erase(occupierIDs.begin()+index);
 			} else {
 				int index = -1;
-				for(unsigned int k = 0; k<occupiers.size() && index==-1; k++) {
-					if(occupierIDs[k]==id) {
-						if(occupiers[k].compare(sTakenBy)==0) { 
-							index = k;
+				for(unsigned int i = 0; i<occupiers.size() && index==-1; i++) {
+					if(occupierIDs[i]==id) {
+						if(occupiers[i]->compare(sTakenBy)==0) { 
+							index = i;
+							delete occupiers[index];
 							occupiers.erase(occupiers.begin()+index);
 						}
 					}
@@ -69,7 +77,7 @@ namespace tbc {
 		bool GetTaken(string check) {
 			bool present = false;
 			for(unsigned int i = 0; i<occupiers.size() && present == false; i++) {
-				if(occupiers[i].compare(check)==0) {
+				if(occupiers[i]->compare(check)==0) {
 					present = true;
 				}	
 			}
@@ -83,29 +91,23 @@ namespace tbc {
 	int tileSize = 8; //Size of tiles defaults to 8, this can be changed at any time.
 
 
-	cdTile::cdTile() {
-		tX = 0;
-		tY = 0;
-	}
-
-
 
 	void initCollisionTiles(int areaWidth, int areaHeight) {
 		tiles.clear();
 
-		int xTiles = areaWidth/tileSize;
-		int yTiles = areaHeight/tileSize;
+		unsigned int xTiles = areaWidth/tileSize;
+		unsigned int yTiles = areaHeight/tileSize;
 
 		tiles.resize(xTiles);
-		for(int i=0; i<xTiles; i++) {
-			tiles[i].resize(yTiles);
-		}
 		
-		for(int i=0; i < xTiles; i++) {
-			for(int u=0; u < yTiles; u++) {
-				tiles[i][u].setValues(i*tileSize, u*tileSize);
+		unsigned long begTime = clock();
+		for(unsigned int i=0; i<xTiles; i++) {
+			tiles[i].resize(yTiles);
+			for(unsigned int y=0; y<yTiles; y++) {
+				tiles[i][y] = cdTile(i*tileSize, y*tileSize);
 			}
 		}
+		cout << "Creation of Collision Tile Array took " << (unsigned long) (clock() - begTime) / CLOCKS_PER_SEC << "seconds"<< endl;
 	}
 
 
@@ -209,7 +211,7 @@ namespace tbc {
 
 		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-				tiles[i][u].setTaken(sOccupier, -1);
+				tiles[i][u].unset(sOccupier, -1);
 			}
 		}
 	}
@@ -232,7 +234,7 @@ namespace tbc {
 
 		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-				tiles[i][u].setTaken(sOccupier, -1);
+				tiles[i][u].setTaken(new string(sOccupier), -1);
 			}
 		}
 	}
@@ -252,7 +254,7 @@ namespace tbc {
 		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				yourTiles.push_back(&tiles[i][u]);
-				tiles[i][u].setTaken(sOccupier, id);
+				tiles[i][u].setTaken(new string(sOccupier), id);
 			}
 		}
 
