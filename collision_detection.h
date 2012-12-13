@@ -25,7 +25,7 @@ namespace tbc {
 
 	public:
 		cdTile(int x, int y) : tX(x), tY(y) {}
-		cdTile() {tX=0;tY=0;}
+		cdTile() : tX(0), tY(0) {}
 		~cdTile() {
 			for(unsigned int i=0; i<occupiers.size(); i++) {
 				delete occupiers[i];
@@ -38,28 +38,15 @@ namespace tbc {
 		}
 		
 		void unset(string sTakenBy, int id) {
-			if(id == -1) {
-				int index = -1;
-				for(unsigned int i = 0; i < occupiers.size() && index==-1; i++) {
-					if(occupiers[i]->compare(sTakenBy)==0) {
-						index = i;
-						delete occupiers[index];
-						occupiers.erase(occupiers.begin()+index);
+			for(unsigned int i = 0; i<occupiers.size(); i++) {
+				if(occupierIDs[i]==id || id == -1) { //if id is -1, we don't care about it
+					if(occupiers[i]->compare(sTakenBy)==0) { 
+						delete occupiers[i];
+						occupiers.erase(occupiers.begin()+i);
+						occupierIDs.erase(occupierIDs.begin()+i);
+						i-=1;
 					}
 				}
-				occupierIDs.erase(occupierIDs.begin()+index);
-			} else {
-				int index = -1;
-				for(unsigned int i = 0; i<occupiers.size() && index==-1; i++) {
-					if(occupierIDs[i]==id) {
-						if(occupiers[i]->compare(sTakenBy)==0) { 
-							index = i;
-							delete occupiers[index];
-							occupiers.erase(occupiers.begin()+index);
-						}
-					}
-				}
-				occupierIDs.erase(occupierIDs.begin()+index);
 			}
 		}
 		
@@ -75,18 +62,15 @@ namespace tbc {
 
 		bool GetTaken()						{return !occupiers.empty();}
 		bool GetTaken(string check) {
-			bool present = false;
-			for(unsigned int i = 0; i<occupiers.size() && present == false; i++) {
+			for(unsigned int i = 0; i<occupiers.size(); i++) {
 				if(occupiers[i]->compare(check)==0) {
-					present = true;
+					return true;
 				}	
 			}
-			return present;
 		}
 	};
 
 	vector<vector<cdTile> > tiles;
-	//vector<cdTile *> takenTiles;
 
 	int tileSize = 8; //Size of tiles defaults to 8, this can be changed at any time.
 
@@ -173,18 +157,11 @@ namespace tbc {
 		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
 		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
-		if(!OnlyReturnTaken) {
-			for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-				for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+				// If the tile is taken, it should always be pushed into the vector, else we have to check if the user only wants the taken tiles.
+				if(tiles[i][u].GetTaken() || !OnlyReturnTaken) { 
 					collisionArray.push_back(&tiles[i][u]);
-				}
-			}
-		} else {
-			for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-				for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-					if(tiles[i][u].GetTaken()) {
-						collisionArray.push_back(&tiles[i][u]);
-					}
 				}
 			}
 		}
