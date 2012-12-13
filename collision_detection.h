@@ -50,7 +50,6 @@ namespace tbc {
 			}
 		}
 		
-
 		void setValues(int xPos, int yPos) {
 			tX = xPos;
 			tY = yPos;
@@ -67,6 +66,7 @@ namespace tbc {
 					return true;
 				}	
 			}
+			return false;
 		}
 	};
 
