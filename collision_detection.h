@@ -68,11 +68,6 @@ namespace tbc {
 			}
 			return false;
 		}
-		
-		pair<vector<string *> *, vector<int> *> GetInfo() {
-			pair<vector<string *> *, vector<int> *> p(&occupiers, &occupierIDs);
-			return p;
-		}
 	};
 
 	vector<vector<cdTile> > tiles;
@@ -116,8 +111,8 @@ namespace tbc {
 		
 		bool collision = false;
 
-		for(int i = (minX-(minX%tileSize))/tileSize; i <= (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u <= (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				if(tiles[i][u].GetTaken(sOccupier)) {
 					collision = true;
 				}
@@ -139,8 +134,8 @@ namespace tbc {
 		
 		bool collision = false;
 
-		for(int i = (minX-(minX%tileSize))/tileSize; i <= (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u <= (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				if(tiles[i][u].GetTaken()) {
 					collision = true;
 				}
@@ -162,8 +157,8 @@ namespace tbc {
 		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
 		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
-		for(int i = (minX-(minX%tileSize))/tileSize; i <= (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u <= (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				// If the tile is taken, it should always be pushed into the vector, else we have to check if the user only wants the taken tiles.
 				if(tiles[i][u].GetTaken() || !OnlyReturnTaken) { 
 					collisionArray.push_back(&tiles[i][u]);
@@ -191,8 +186,8 @@ namespace tbc {
 		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
 		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
-		for(int i = (minX-(minX%tileSize))/tileSize; i <= (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u <= (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				tiles[i][u].unset(sOccupier, -1);
 			}
 		}
@@ -214,8 +209,8 @@ namespace tbc {
 		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
 		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
-		for(int i = (minX-(minX%tileSize))/tileSize; i <= (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u <= (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				tiles[i][u].setTaken(new string(sOccupier), -1);
 			}
 		}
@@ -233,8 +228,8 @@ namespace tbc {
 
 		vector<cdTile *> yourTiles;	
 
-		for(int i = (minX-(minX%tileSize))/tileSize; i <= (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u <= (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
 				yourTiles.push_back(&tiles[i][u]);
 				tiles[i][u].setTaken(new string(sOccupier), id);
 			}
