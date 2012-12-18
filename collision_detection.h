@@ -68,15 +68,46 @@ namespace tbc {
 			}
 			return false;
 		}
+		
+		pair<vector<string *> *, vector<int> *> GetInfo() {
+			pair<vector<string *> *, vector<int> *> p(&occupiers, &occupierIDs);
+			return p;
+		}
 	};
 
 	vector<vector<cdTile> > tiles;
 
 	int tileSize = 8; //Size of tiles defaults to 8, this can be changed at any time.
+	
+	vector<cdTile *> lastCollisions;
+	
+	///////////////////////////////////////////////////////////////
+	/// \brief Return a vector of the last found collisions
+	///
+	/// After a call to CheckCollision, you can retrieve the
+	/// the pointers to the tiles that returned true during
+	/// the check by calling this function.
+	///
+	/// \see CheckCollision
+	///
+	///////////////////////////////////////////////////////////////
+	vector<cdTile *> GetLastCollisions()	{return lastCollisions;}
 
 
-
-	void initCollisionTiles(int areaWidth, int areaHeight) {
+	///////////////////////////////////////////////////////////////
+	/// \brief Initialise the Collision Detection System for use
+	/// 
+	/// This is required before using any of the functions included
+	/// in this collision detection library.
+	/// You can also use this function to reset the current
+	/// states of tiles.
+	///
+	/// \param areaWidth	Width of the area you want to initialise.
+	/// \param areaHeight	Height of the area you want to initialise.
+	/// \param verbDebug	Include message in prompt with loadtime?
+	///
+	///////////////////////////////////////////////////////////////
+	void InitCollisionTiles(unsigned int areaWidth, unsigned int areaHeight, bool verbDebug = false) {
 		tiles.clear();
 
 		unsigned int xTiles = areaWidth/tileSize;
@@ -91,15 +122,40 @@ namespace tbc {
 				tiles[i][y] = cdTile(i*tileSize, y*tileSize);
 			}
 		}
-		cout << "Creation of Collision Tile Array took " << (unsigned long) (clock() - begTime) / CLOCKS_PER_SEC << "seconds"<< endl;
+		
+		if(verbDebug) {
+			cout << "Creation of Collision Tile Array took " << (unsigned long) (clock() - begTime) / CLOCKS_PER_SEC << "seconds"<< endl;
+		}
 	}
 
 
-	/////////////////////////////////////////////////
-	//--------Actual collsion checking-------------//
-	/////////////////////////////////////////////////
-
-	bool CheckCollision(int minX, int minY, int maxX, int maxY, string sOccupier) {
+	
+	///////////////////////////////////////////////////////////////
+	/// \brief Check a rectangle for collisions
+	///
+	/// This is the main function of TBC.
+	/// Use it to check for a collision against tiles
+	/// claimed by a specific identifier, or just if any
+	/// tiles within the specified rectangle are taken.
+	///
+	/// Do feel free to create your own wrapper
+	/// functions for simplified use.
+	///
+	/// \param minX 	The left coordinate of your rectangle
+	/// \param minY 	The top coordinate of your rectangle
+	/// \param maxX 	The right coordinate of your rectangle
+	/// \param maxY 	The bottom coordinate of your rectangle
+	/// \param sOccupier The identifier to check against (if specified).
+	/// \param stopAfterFirst Should the function stop checking for collision once one has been found?
+	///
+	/// \see GetLastCollisions
+	///
+	///////////////////////////////////////////////////////////////
+	bool CheckCollision(int minX, int minY, int maxX, int maxY, string sOccupier = "", bool stopAfterFirst = false) {
+		lastCollisions.clear();
+		bool useIdent = true;
+		if(sOccupier.compare("") == 0) {useIdent = false;}
+		
 		int posXTiles;
 		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
 		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
@@ -110,43 +166,47 @@ namespace tbc {
 		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 		
 		bool collision = false;
-
-		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
+		
+		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize && (!collision || !stopAfterFirst); i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-				if(tiles[i][u].GetTaken(sOccupier)) {
-					collision = true;
+				if(useIdent) {
+					if(tiles[i][u].GetTaken(sOccupier)) {
+						collision = true;
+						lastCollisions.push_back(&tiles[i][u]);
+						if(stopAfterFirst) {break;}
+					}
+				} else {
+					if(tiles[i][u].GetTaken()) {
+						collision = true;
+						lastCollisions.push_back(&tiles[i][u]);
+						if(stopAfterFirst) {break;}
+					}
 				}
 			}
 		}
 		
 		return collision;
 	}
+	
+	
 
-	bool CheckCollision(int minX, int minY, int maxX, int maxY) {
-		int posXTiles;
-		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
-		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
-
-			
-		int posYTiles;
-		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
-		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
-		
-		bool collision = false;
-
-		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-				if(tiles[i][u].GetTaken()) {
-					collision = true;
-				}
-			}
-		}
-		
-		return collision;
-	}
-
-
-	vector<cdTile *> CollisionArray(int minX, int minY, int maxX, int maxY, bool OnlyReturnTaken) {
+	///////////////////////////////////////////////////////////////
+	/// \brief Returns a vector with pointers to the tiles in the given area
+	///
+	/// Use this when you need to access every tile inside an area.
+	/// Maybe you want to check if an area has tiles with multiple
+	/// identifiers?
+	///
+	/// \param minX 	The left coordinate of your rectangle
+	/// \param minY 	The top coordinate of your rectangle
+	/// \param maxX 	The right coordinate of your rectangle
+	/// \param maxY 	The bottom coordinate of your rectangle
+	/// \param OnlyReturnTaken Should the vector only contain taken tiles?
+	///
+	/// \see CheckCollision
+	///
+	///////////////////////////////////////////////////////////////
+	vector<cdTile *> CollisionArray(int minX, int minY, int maxX, int maxY, bool OnlyReturnTaken = true) {
 		vector<cdTile *> collisionArray;
 		
 		int posXTiles;
@@ -169,13 +229,38 @@ namespace tbc {
 		return collisionArray;
 	}
 
-	
+	///////////////////////////////////////////////////////////////
+	/// \brief Dismisses ownership of tiles
+	///
+	/// This function removes all traces of occupiers
+	/// that match the given sOccupier and the given id.
+	/// The tiles in this vector will still retain
+	/// all other claims of ownership with other occupiers
+	/// and IDs.
+	///
+	/// \param vec Vector returned from SetTilesTaken
+	/// \param sOccupier The identifier to check against.
+	/// \param id The ID to check against.
+	///
+	/// \see SetTilesTaken
+	///
+	///////////////////////////////////////////////////////////////
 	void UnSetTilesTaken(vector<cdTile *> vec, string sOccupier, int id) {
 		for(unsigned int i = 0; i<vec.size(); i++) {
 			vec[i]->unset(sOccupier, id);
 		}
 	}
-
+	
+	///////////////////////////////////////////////////////////////
+	/// \brief Removes all instances of the given occupier from the tiles in the given area
+	///
+	/// \param minX 	The left coordinate of your rectangle
+	/// \param minY 	The top coordinate of your rectangle
+	/// \param maxX 	The right coordinate of your rectangle
+	/// \param maxY 	The bottom coordinate of your rectangle
+	/// \param sOccupier The identifier to check against.
+	///
+	/// \see SetTilesTaken, InitCollisionTiles
 	void UnSetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier) {
 		int posXTiles;
 		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
@@ -193,48 +278,43 @@ namespace tbc {
 		}
 	}
 
-
-	////////////////////////////////////////////////////////////////
-	// ---------------- Set Taken Tiles --------------------------//
-	////////////////////////////////////////////////////////////////
-
-
-	void SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier) {
+	///////////////////////////////////////////////////////////////
+	/// \brief Set ownership of tiles in the given area
+	///
+	/// Use it to set the states of the tiles in the area
+	/// to also include sOccupier and id (if specified).
+	///
+	/// Do feel free to create your own wrapper
+	/// functions for simplified use.
+	///
+	/// \param minX 	The left coordinate of your rectangle
+	/// \param minY 	The top coordinate of your rectangle
+	/// \param maxX 	The right coordinate of your rectangle
+	/// \param maxY 	The bottom coordinate of your rectangle
+	/// \param sOccupier The identifier to fill into the tiles
+	/// \param id		The id to fill into the tiles (optional)
+	///
+	/// \see UnSetTilesTaken
+	///
+	///////////////////////////////////////////////////////////////
+	vector<cdTile *> SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier, int id = 0) {
 		int posXTiles;
 		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
 		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
-
-		
-		int posYTiles;
-		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
-		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
-
-		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
-			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-				tiles[i][u].setTaken(new string(sOccupier), -1);
-			}
-		}
-	}
-
-	vector<cdTile *> SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier, int id) {
-		int posXTiles;
-		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
-		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
-
 		
 		int posYTiles;
 		if((maxY-minY)%tileSize==0) {posYTiles = (maxY-minY)/tileSize;}
 		else {posYTiles = ((maxY-minY)+tileSize)/tileSize;}
 
 		vector<cdTile *> yourTiles;	
-
+		
 		for(int i = (minX-(minX%tileSize))/tileSize; i < (minX-(minX%tileSize)+posXTiles*tileSize)/tileSize; i++) {
 			for(int u = (minY-(minY%tileSize))/tileSize; u < (minY-(minY%tileSize)+posYTiles*tileSize)/tileSize; u++) {
-				yourTiles.push_back(&tiles[i][u]);
+				if(id!=0) {yourTiles.push_back(&tiles[i][u]);}
 				tiles[i][u].setTaken(new string(sOccupier), id);
 			}
 		}
-
+		
 		return yourTiles;
 	}
 }
