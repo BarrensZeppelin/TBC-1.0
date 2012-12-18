@@ -145,7 +145,7 @@ namespace tbc {
 	/// \param minY 	The top coordinate of your rectangle
 	/// \param maxX 	The right coordinate of your rectangle
 	/// \param maxY 	The bottom coordinate of your rectangle
-	/// \param sOccupier The identifier to check against (if specified).
+	/// \param sOccupier The identifier to check against (if specified)
 	/// \param stopAfterFirst Should the function stop checking for collision once one has been found?
 	///
 	/// \see GetLastCollisions
@@ -188,7 +188,83 @@ namespace tbc {
 		return collision;
 	}
 	
-	
+	///////////////////////////////////////////////////////////////
+	/// \brief Checks for collisions in a line
+	///
+	/// This can be especially useful for objects moving at very
+	/// fast speeds, to check if an object has passed through
+	/// another, rather than checking if the object has been on
+	/// top of another object.
+	///
+	/// \param x0 Line-Coordinate x0 (Start point)
+	/// \param y0 Line-Coordinate y0 (Start point)
+	/// \param x1 Line-Coordinate x1 (Endpoint)
+	/// \param y1 Line-Coordinate y1 (Endpoint)
+	/// \param xOffset Offset amount on the x-axis. Used for collision checking
+	/// \param yOffset Offset amount on the y-axis. Used for collision checking
+	/// \param objWidth Width of the object you are checking for
+	/// \param objHeight Height of the object you are checking for
+	/// \param sOccupier The identifier to check against (if specified)
+	///
+	/// \see CheckCollision, GetLastCollisions
+	///
+	///////////////////////////////////////////////////////////////
+	bool LineCheck(int x0, int y0, int x1, int y1, int xOffset, int yOffset, int objWidth, int objHeight, string sOccupier = "") {
+		bool useIdent = true;
+		if(sOccupier.compare("") == 0) {useIdent = false;}
+		
+		x0 = floor(x0 / objWidth);
+		y0 = floor(y0 / objHeight);
+		x1 = floor(x1 / objWidth);
+		y1 = floor(y1 / objHeight);
+
+		///////////////////////////////////////////////////////////////////
+		bool steep = abs(y1-y0) > abs(x1-x0);
+		
+		if(steep) {
+			swap(x0, y0);
+			swap(x1, y1);
+		}
+		if(x0 > x1) {
+			swap(x0, x1);
+			swap(y0, y1);
+		}
+		
+		int deltax = x1 - x0;
+		int deltay = abs(y1 - y0);
+
+		double error = 0;
+		double deltaerr;
+		if(deltax!=0) {deltaerr = double(deltay) / double(deltax);}
+		else deltaerr = 0;
+
+		int ystep;
+		int y = y0;
+		if (y0 < y1) {ystep=1;} else {ystep=-1;}
+		
+		bool collision = false;
+
+		for(int x=x0; x<=x && !collision; x++) {
+			int rx = x;
+			int ry = y;
+			if(steep) {rx = y; ry = x;}
+
+			if(useIdent) {
+				collision = CheckCollision(rx*objWidth + xOffset, ry*objHeight + yOffset, (rx+1)*objWidth + xOffset, (ry+1)*objHeight + yOffset, sOccupier);
+			} else {
+				collision = CheckCollision(rx*objWidth + xOffset, ry*objHeight + yOffset, (rx+1)*objWidth + xOffset, (ry+1)*objHeight + yOffset);
+			}
+
+			error+=deltaerr;
+			if(error>0.5) {
+				y += ystep;
+				error -= 1.0;
+			}
+		}
+		/////////////////////////////////////////////////////////////////////////////////////
+		
+		return collision;
+	}
 
 	///////////////////////////////////////////////////////////////
 	/// \brief Returns a vector with pointers to the tiles in the given area
@@ -261,6 +337,8 @@ namespace tbc {
 	/// \param sOccupier The identifier to check against.
 	///
 	/// \see SetTilesTaken, InitCollisionTiles
+	///
+	///////////////////////////////////////////////////////////////
 	void UnSetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier) {
 		int posXTiles;
 		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
