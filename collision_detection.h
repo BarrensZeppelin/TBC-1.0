@@ -375,7 +375,7 @@ namespace tbc {
 	/// \see UnSetTilesTaken
 	///
 	///////////////////////////////////////////////////////////////
-	vector<cdTile *> SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier, int id = 0) {
+	vector<cdTile *> SetTilesTaken(int minX, int minY, int maxX, int maxY, string sOccupier, int id = -1) {
 		int posXTiles;
 		if((maxX-minX)%tileSize==0) {posXTiles = (maxX-minX)/tileSize;}
 		else {posXTiles = ((maxX-minX)+tileSize)/tileSize;}
