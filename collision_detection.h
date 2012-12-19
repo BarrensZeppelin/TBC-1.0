@@ -213,6 +213,17 @@ namespace tbc {
 		bool useIdent = true;
 		if(sOccupier.compare("") == 0) {useIdent = false;}
 		
+		
+		// Two quick checks at the start and endpoint
+		if(useIdent) {
+			if(CheckCollision(x0 + xOffset, y0 + yOffset, x0 + objWidth + xOffset, y0 + objHeight + yOffset, sOccupier)) {return true;}
+			if(CheckCollision(x1 + xOffset, y1 + yOffset, x1 + objWidth + xOffset, y1 + objHeight + yOffset, sOccupier)) {return true;}
+		} else {
+			if(CheckCollision(x0 + xOffset, y0 + yOffset, x0 + objWidth + xOffset, y0 + objHeight + yOffset)) {return true;}
+			if(CheckCollision(x1 + xOffset, y1 + yOffset, x1 + objWidth + xOffset, y1 + objHeight + yOffset)) {return true;}
+		}
+		
+		
 		x0 = floor(x0 / objWidth);
 		y0 = floor(y0 / objHeight);
 		x1 = floor(x1 / objWidth);
