@@ -224,10 +224,10 @@ namespace tbc {
 		}
 		
 		
-		x0 = floor(x0 / objWidth);
-		y0 = floor(y0 / objHeight);
-		x1 = floor(x1 / objWidth);
-		y1 = floor(y1 / objHeight);
+		x0 = floor((float)x0 / objWidth);
+		y0 = floor((float)y0 / objHeight);
+		x1 = floor((float)x1 / objWidth);
+		y1 = floor((float)y1 / objHeight);
 
 		///////////////////////////////////////////////////////////////////
 		bool steep = abs(y1-y0) > abs(x1-x0);
@@ -255,7 +255,7 @@ namespace tbc {
 		
 		bool collision = false;
 
-		for(int x=x0; x<=x && !collision; x++) {
+		for(int x=x0; x<=x1 && !collision; x++) {
 			int rx = x;
 			int ry = y;
 			if(steep) {rx = y; ry = x;}
